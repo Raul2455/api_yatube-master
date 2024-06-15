@@ -1,15 +1,11 @@
-"""
-API ViewSets для приложения Posts.
+"""API ViewSets для приложения Posts."""
 
-включая представления для постов, групп и комментариев.
-"""
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions
-from rest_framework import viewsets
+from rest_framework import permissions, viewsets
 
 from posts.models import Group, Post
-from .permissions import IsAuthorOrReadOnly
-from .serializers import GroupSerializer, PostSerializer, CommentSerializer
+from api.permissions import IsAuthorOrReadOnly
+from api.serializers import GroupSerializer, PostSerializer, CommentSerializer
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
@@ -47,7 +43,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Возвращает комментарии к указанному сообщению."""
-        post = get_object_or_404(Post, id=self.kwargs.get('post_id'))
+        post = self.get_post()
         return post.comments
 
     def perform_create(self, serializer):
@@ -57,14 +53,9 @@ class CommentViewSet(viewsets.ModelViewSet):
         указав в качестве автора текущего пользователя,
         а в качестве записи - указанную запись.
         """
-        post = get_object_or_404(Post, id=self.kwargs.get('post_id'))
+        post = self.get_post()
         serializer.save(author=self.request.user, post=post)
 
-    def perform_update(self, serializer):
-        """
-        Обновляет экземпляр комментария.
-
-        указав в качестве автора текущего пользователя,
-        а в качестве записи - исходную запись.
-        """
-        serializer.save(author=self.request.user, post=self.get_object().post)
+    def get_post(self):
+        """Возвращает указанный пост."""
+        return get_object_or_404(Post, id=self.kwargs.get('post_id'))

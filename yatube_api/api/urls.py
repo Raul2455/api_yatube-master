@@ -1,12 +1,5 @@
-"""
-URL-конфигурация приложения API.
-
-Определяет маршруты для доступа к API приложения,
-включая получение токенов аутентификации
-и обработку запросов к постам, группам и комментариям.
-"""
+"""URL-конфигурация приложения API."""
 from django.urls import include, path
-
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
@@ -20,7 +13,6 @@ router_v1.register(
     CommentViewSet,
     basename="comment"
 )
-
 
 urlpatterns = [
     path('v1/', include(router_v1.urls)),
